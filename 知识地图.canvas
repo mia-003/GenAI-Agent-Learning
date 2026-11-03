@@ -1,0 +1,186 @@
+{
+  "nodes": [
+    {
+      "id": "n0",
+      "type": "file",
+      "file": "笔记/章节/01-Agent入门.md",
+      "x": 0,
+      "y": 0,
+      "width": 330,
+      "height": 160,
+      "color": "4"
+    },
+    {
+      "id": "n1",
+      "type": "file",
+      "file": "笔记/章节/02-上下文工程.md",
+      "x": 380,
+      "y": 0,
+      "width": 330,
+      "height": 160,
+      "color": "4"
+    },
+    {
+      "id": "n2",
+      "type": "file",
+      "file": "笔记/章节/04-工具与MCP.md",
+      "x": 760,
+      "y": 0,
+      "width": 330,
+      "height": 160,
+      "color": "4"
+    },
+    {
+      "id": "n3",
+      "type": "file",
+      "file": "笔记/章节/03-记忆与知识库.md",
+      "x": 0,
+      "y": 240,
+      "width": 330,
+      "height": 160,
+      "color": "4"
+    },
+    {
+      "id": "n4",
+      "type": "file",
+      "file": "笔记/章节/05-CodingAgent.md",
+      "x": 380,
+      "y": 240,
+      "width": 330,
+      "height": 160,
+      "color": "4"
+    },
+    {
+      "id": "n5",
+      "type": "file",
+      "file": "笔记/章节/07-Agent评估.md",
+      "x": 760,
+      "y": 240,
+      "width": 330,
+      "height": 160,
+      "color": "5"
+    },
+    {
+      "id": "n6",
+      "type": "file",
+      "file": "笔记/章节/09-持续进化.md",
+      "x": 0,
+      "y": 480,
+      "width": 330,
+      "height": 160,
+      "color": "5"
+    },
+    {
+      "id": "n7",
+      "type": "file",
+      "file": "笔记/章节/06-交互与异步.md",
+      "x": 380,
+      "y": 480,
+      "width": 330,
+      "height": 160,
+      "color": "5"
+    },
+    {
+      "id": "n8",
+      "type": "file",
+      "file": "笔记/章节/10-多Agent协作.md",
+      "x": 760,
+      "y": 480,
+      "width": 330,
+      "height": 160,
+      "color": "5"
+    },
+    {
+      "id": "n9",
+      "type": "file",
+      "file": "笔记/章节/08-模型后训练.md",
+      "x": 0,
+      "y": 720,
+      "width": 330,
+      "height": 160,
+      "color": "2"
+    },
+    {
+      "id": "n10",
+      "type": "file",
+      "file": "笔记/章节/项目设计.md",
+      "x": 380,
+      "y": 720,
+      "width": 330,
+      "height": 160,
+      "color": "2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "n0",
+      "fromSide": "right",
+      "toNode": "n1",
+      "toSide": "left"
+    },
+    {
+      "id": "e2",
+      "fromNode": "n1",
+      "fromSide": "right",
+      "toNode": "n2",
+      "toSide": "left"
+    },
+    {
+      "id": "e3",
+      "fromNode": "n2",
+      "fromSide": "bottom",
+      "toNode": "n3",
+      "toSide": "top"
+    },
+    {
+      "id": "e4",
+      "fromNode": "n3",
+      "fromSide": "right",
+      "toNode": "n4",
+      "toSide": "left"
+    },
+    {
+      "id": "e5",
+      "fromNode": "n4",
+      "fromSide": "right",
+      "toNode": "n5",
+      "toSide": "left"
+    },
+    {
+      "id": "e6",
+      "fromNode": "n5",
+      "fromSide": "bottom",
+      "toNode": "n6",
+      "toSide": "top"
+    },
+    {
+      "id": "e7",
+      "fromNode": "n6",
+      "fromSide": "right",
+      "toNode": "n7",
+      "toSide": "left"
+    },
+    {
+      "id": "e8",
+      "fromNode": "n7",
+      "fromSide": "right",
+      "toNode": "n8",
+      "toSide": "left"
+    },
+    {
+      "id": "e9",
+      "fromNode": "n8",
+      "fromSide": "bottom",
+      "toNode": "n9",
+      "toSide": "top"
+    },
+    {
+      "id": "e10",
+      "fromNode": "n9",
+      "fromSide": "right",
+      "toNode": "n10",
+      "toSide": "left"
+    }
+  ]
+}
