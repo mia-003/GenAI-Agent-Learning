@@ -5,10 +5,13 @@ Icon?
 .materials/
 .local-backups/
 .obsidian/
-每日记录/
-笔记/
-实验记录/
-教材/
+04-学习记录/
+03-学习笔记/*
+!03-学习笔记/使用指南.md
+!03-学习笔记/知识地图.canvas
+!03-学习笔记/模板/
+02-教材/
+05-项目实践/
 附件/
 .env
 .env.*
@@ -18,4 +21,3 @@ Icon?
 node_modules/
 .sync-lock/
 .sync-status.json
-学习记录索引.md
