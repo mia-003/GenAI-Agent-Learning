@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -27,5 +28,23 @@ try {
   data=JSON.parse(fs.readFileSync(path.join(tmp,'docs/data.json')));
   assert.equal(M.stats(data).days,2);
   assert(!fs.existsSync(path.join(tmp,'public-notes')));
-  console.log('PASS: weekly-plan daily completion, unknown time, note inventory, no duplicate note exports, no daily files.');
+  const record={text:'上下文与工具\n<img src=x> -->',date:'2026-11-03',updatedAt:'2026-11-04T01:00:00Z'};
+  const saved=M.setSummary(weekText,'W1D1',record);
+  assert.deepEqual(M.week('',saved).days[0].record,record);
+  assert.equal(M.week('',saved).days[0].body,M.week('',weekText).days[0].body);
+  assert.equal(M.setSummary(saved,'W1D1',record),saved);
+  assert.equal(M.week('',M.setDayCompletion(saved,'W1D1',true)).days[0].done,true);
+  const source=fs.readFileSync(path.join(root,'workbench/web.js'),'utf8');
+  const memory=new Map();let failWrite=false;
+  async function browser(){
+   let api,view;const rootElement={dataset:{},querySelector:()=>({})};
+   const context={structuredClone,AgentModel:M,AgentDashboard:{mount:(r,d,a)=>{api=a;view=d;}},fetch:async()=>({ok:true,json:async()=>structuredClone(data)}),document:{getElementById:()=>rootElement},window:{addEventListener:()=>{}},localStorage:{getItem:k=>memory.get(k)||null,setItem:(k,v)=>{if(failWrite)throw Error('quota');memory.set(k,v);}}};
+   vm.runInNewContext(source,context);await new Promise(resolve=>setImmediate(resolve));return {api,view};
+  }
+  let page=await browser();await page.api.saveSummary('', 'W1D3',record,true);
+  page=await browser();assert.equal(page.view.weeks[0].days[2].record.text,record.text);assert.equal(page.view.weeks[0].days[2].done,true);
+  failWrite=true;await assert.rejects(()=>page.api.saveSummary('','W1D3',{...record,text:'should not persist'},false),/保存失败/);
+  assert.equal(page.view.weeks[0].days[2].record.text,record.text);
+  failWrite=false;await page.api.toggleDay('','W1D3',false);page=await browser();assert.equal(page.view.weeks[0].days[2].done,false);assert.equal(page.view.weeks[0].days[2].record.text,record.text);
+  console.log('PASS: weekly-plan daily completion, unknown time, note inventory, no duplicate note exports, no daily files; summary round-trip, reload persistence, completion undo and write-failure handling.');
 } finally {fs.rmSync(tmp,{recursive:true,force:true});}
