@@ -18,7 +18,14 @@ function mount(root,data,api,selection={}){
  const select=(w,d,t=tab)=>mount(root,data,api,{week:w,day:d,tab:t});
  const shell=el('div','aw-shell');root.append(shell);
  const top=el('header','aw-top');const brand=el('div','aw-brand');brand.append(el('span','aw-logo','a.'),el('span','aw-brand-text','AGENT STUDIO'));
- const topActions=el('div','aw-top-actions');topActions.append(button('知识地图 ↗',()=>api.open('03-学习笔记/知识地图.canvas'),'aw-quiet'),button(api.editable?'同步 GitHub ↗':'GitHub ↗',()=>api.editable?api.sync():api.repo(),'aw-quiet'));
+ function showLibrary(){
+  const dialog=el('dialog','aw-library');const dialogHead=el('div','aw-library-head');dialogHead.append(el('h2',null,'学习资料'),button('关闭 ×',()=>{dialog.close();dialog.remove();},'aw-quiet'));dialog.append(dialogHead);
+  dialog.append(el('p','aw-library-hint',api.editable?'所有学习文件的快捷入口。':'周安排与学习路线在 GitHub 查看；本地笔记和知识地图通过 Obsidian 打开。'));
+  const sections=[['周任务安排',data.weeks.map(w=>({title:`W${w.week} · ${w.title}`,path:w.path}))],['章节笔记',data.library?.notes||[]],['学习路线',data.library?.plans||[]],['教材与知识地图',[{title:'中文版 PDF · 在线教材',url:'https://github.com/bojieli/ai-agent-book/releases/download/latest/AI-Agents-in-Depth-zh-CN.pdf'},{title:'教材正文与实验 · GitHub',url:'https://github.com/bojieli/ai-agent-book/tree/main/book'},{title:'中文版 PDF · 本地',path:'02-教材/深入理解AI-Agent-中文版.pdf'},{title:'知识地图 · Obsidian',path:'03-知识地图/知识地图.canvas'}]]];
+  for(const [name,items]of sections){const section=el('section','aw-library-section');section.append(el('h3',null,name));const links=el('div','aw-library-links');for(const item of items)links.append(button(item.title+' ↗',()=>item.url?scope.open(item.url,'_blank','noopener,noreferrer'):api.open(item.path),'aw-library-link'));section.append(links);dialog.append(section);}
+  dialog.addEventListener('close',()=>dialog.remove());root.append(dialog);dialog.showModal();
+ }
+ const topActions=el('div','aw-top-actions');topActions.append(button('资料入口',()=>showLibrary(),'aw-quiet'),button('知识地图 ↗',()=>api.open('03-知识地图/知识地图.canvas'),'aw-quiet'),button(api.editable?'同步 GitHub ↗':'GitHub ↗',()=>api.editable?api.sync():api.repo(),'aw-quiet'));
  top.append(brand,topActions);shell.append(top);
  const heading=el('section','aw-heading');const h=el('div');h.append(el('p','aw-kicker','YOUR PERSONAL LEARNING SPACE'),el('h1',null,'学习工作台'));
  const date=el('div','aw-date');date.append(el('span',null,M.localDate()),el('small',null,api.editable?'本地学习空间':'公开学习进度'));
@@ -32,7 +39,7 @@ function mount(root,data,api,selection={}){
  heroText.append(el('div','aw-focus-top',`${day.done?'已完成':'当前查看'}  /  W${week.week} · DAY ${day.day}`),el('h2',null,day.title),el('p','aw-focus-sub',`${week.chapter}  ·  ${day.allocation}`));
  const heroActions=el('div','aw-focus-actions');
  if(api.editable){const done=button(day.done?'✓ 已完成 · 撤销':'标记这一天完成',()=>api.toggleDay(week.path,day.key,!day.done),'aw-button aw-primary'+(day.done?' is-done':''));done.setAttribute('aria-pressed',String(day.done));heroActions.append(done);}
- else heroActions.append(button('在 Obsidian 中学习 ↗',()=>api.openVault(),'aw-button aw-primary'));
+ else heroActions.append(button('在 Obsidian 中勾选进度 ↗',()=>api.open(week.path),'aw-button aw-primary'));
  heroActions.append(button('打开章节笔记 ↗',()=>api.open(week.note),'aw-focus-link'));heroText.append(heroActions);hero.append(heroText);
  const dial=el('div','aw-dial');dial.style.setProperty('--angle',`${week.days.filter(d=>d.done).length/7*360}deg`);const dialInside=el('div');dialInside.append(el('strong',null,`${week.days.filter(d=>d.done).length}`),el('span',null,'/ 7 天'));dial.append(dialInside);hero.append(dial);main.append(hero);
  const content=el('section','aw-card aw-detail');const detailTop=el('div','aw-detail-top');const tabs=el('div','aw-tabs');
