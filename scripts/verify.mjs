@@ -22,10 +22,10 @@ try {
   assert.equal(data.logs[0].date!==undefined,true);
   assert(!JSON.stringify(data).includes('PRIVATE_CANARY'));
   assert(!fs.existsSync(path.join(tmp,'04-学习记录')));
-  assert.equal(fs.readdirSync(path.join(tmp,'public-notes')).filter(n=>n.endsWith('.md')).length,1);
+  assert.equal(data.library.notes.length,2);assert.equal(fs.readFileSync(path.join(dir,'private.md'),'utf8'),privateText);
   fs.writeFileSync(path.join(dir,'public.md'),publicText.replace('publish: true','publish: false'));fs.writeFileSync(weekPath,fs.readFileSync(weekPath,'utf8').replace(/- \[ \] W1D2/, '- [x] W1D2'));build();
   data=JSON.parse(fs.readFileSync(path.join(tmp,'docs/data.json')));
   assert.equal(M.stats(data).days,2);
-  assert.equal(fs.readdirSync(path.join(tmp,'public-notes')).filter(n=>n.endsWith('.md')).length,0);
-  console.log('PASS: weekly-plan daily completion, unknown time, private text filtering, publish removal, no daily files.');
+  assert(!fs.existsSync(path.join(tmp,'public-notes')));
+  console.log('PASS: weekly-plan daily completion, unknown time, note inventory, no duplicate note exports, no daily files.');
 } finally {fs.rmSync(tmp,{recursive:true,force:true});}

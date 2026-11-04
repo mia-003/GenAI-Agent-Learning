@@ -20,7 +20,7 @@ function mount(root,data,api,selection={}){
  const top=el('header','aw-top');const brand=el('div','aw-brand');brand.append(el('span','aw-logo','a.'),el('span','aw-brand-text','AGENT STUDIO'));
  function showLibrary(){
   const dialog=el('dialog','aw-library');const dialogHead=el('div','aw-library-head');dialogHead.append(el('h2',null,'学习资料'),button('关闭 ×',()=>{dialog.close();dialog.remove();},'aw-quiet'));dialog.append(dialogHead);
-  dialog.append(el('p','aw-library-hint',api.editable?'所有学习文件的快捷入口。':'周安排与学习路线在 GitHub 查看；本地笔记和知识地图通过 Obsidian 打开。'));
+  dialog.append(el('p','aw-library-hint',api.editable?'所有学习文件的快捷入口。':'周安排、学习路线和章节笔记在 GitHub 查看；知识地图通过 Obsidian 打开。'));
   const sections=[['周任务安排',data.weeks.map(w=>({title:`W${w.week} · ${w.title}`,path:w.path}))],['章节笔记',data.library?.notes||[]],['学习路线',data.library?.plans||[]],['教材与知识地图',[{title:'中文版 PDF · 在线教材',url:'https://github.com/bojieli/ai-agent-book/releases/download/latest/AI-Agents-in-Depth-zh-CN.pdf'},{title:'教材正文与实验 · GitHub',url:'https://github.com/bojieli/ai-agent-book/tree/main/book'},{title:'中文版 PDF · 本地',path:'02-教材/深入理解AI-Agent-中文版.pdf'},{title:'知识地图 · Obsidian',path:'03-知识地图/知识地图.canvas'}]]];
   for(const [name,items]of sections){const section=el('section','aw-library-section');section.append(el('h3',null,name));const links=el('div','aw-library-links');for(const item of items)links.append(button(item.title+' ↗',()=>item.url?scope.open(item.url,'_blank','noopener,noreferrer'):api.open(item.path),'aw-library-link'));section.append(links);dialog.append(section);}
   dialog.addEventListener('close',()=>dialog.remove());root.append(dialog);dialog.showModal();

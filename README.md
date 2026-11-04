@@ -2,7 +2,7 @@
 
 Mia 的 AI Agent 原理学习与工程实践记录。以《深入理解 AI Agent：设计原理与工程实践》为主线，结合机制实验、失败分析和一个可验证的个人项目。
 
-**[打开可视化学习工作台](https://mia-003.github.io/GenAI-Agent-Learning/)** · [16周路线](01-学习计划/16周学习路线.md) · [公开笔记](public-notes/)
+**[打开可视化学习工作台](https://mia-003.github.io/GenAI-Agent-Learning/)** · [16周路线](01-学习计划/16周学习路线.md) · [章节笔记](04-章节笔记/)
 
 ## 当前进度
 
@@ -46,7 +46,7 @@ Mia 的 AI Agent 原理学习与工程实践记录。以《深入理解 AI Agent
 - [官方教材与实验](https://github.com/bojieli/ai-agent-book)
 - [作者的学习建议](https://github.com/bojieli/ai-agent-book/blob/main/docs/zh-CN/LEARNING.md)
 - 本仓库保存个人路线、公开笔记与工作台源码；官方教材和外部实验留在本地并链接到上游，避免重复分发大型仓库。
-- 章节笔记默认本地；设置publish: true才导出全文，时间和任务进度用于公开统计。
+- 章节笔记直接保存在本仓库的04-章节笔记目录，在线工作台可打开正文；提交使用mia-003与GitHub隐私邮箱。
 
 ## 工作台源码
 
