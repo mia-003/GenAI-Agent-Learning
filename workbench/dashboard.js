@@ -1,20 +1,67 @@
 (function(scope){
 'use strict';
 const M=typeof module!=='undefined'&&module.exports?require('./model.js'):scope.AgentModel;
-const stages=['基础与工具','记忆与评估','能力与取舍','项目与表达'];
-function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
-function button(text,fn,cls='aw-button'){const b=el('button',cls,text);b.type='button';b.addEventListener('click',async()=>{b.disabled=true;try{await fn();}catch(error){const msg=String(error.message||error);if(scope.Notice)new scope.Notice(msg);else alert(msg);}finally{b.disabled=false;}});return b;}
-function mount(root,data,api,selection){root.replaceChildren();root.classList.add('agent-workbench');const today=M.localDate();const s=M.stats(data,today);const active=s.active;let selected=data.weeks.find(w=>w.week===selection)||active;const main=el('div','aw-shell');root.append(main);
-const header=el('header','aw-header');const brand=el('div','aw-brand');brand.append(el('span','aw-brand-mark','A'),el('span',null,'AGENT / LEARNING LAB'));header.append(brand,el('span','aw-date',today+' · '+(api.editable?'本地 Obsidian':'GitHub 公开快照')));main.append(header);
-const hero=el('section','aw-hero');const intro=el('div');intro.append(el('p','aw-eyebrow','从理解原理，到构建自己的 Agent'),el('h1',null,'每一次理解，都留下证据。'),el('p','aw-subtitle','16 个学习周 · 每周 14 小时 · 按任务推进，不必固定每天的节奏。'));const actions=el('div','aw-actions');actions.append(button(api.editable?'＋ 记录今天':'在 Obsidian 中学习',()=>api.editable?api.editLog(today):api.openVault(),'aw-button aw-primary'),button('完整学习路线',()=>api.open('01-学习计划/16周学习路线.md')));intro.append(actions);hero.append(intro);const ring=el('div','aw-ring');ring.style.setProperty('--progress',`${s.percent}%`);const inside=el('div','aw-ring-inside');inside.append(el('strong',null,`${s.percent}%`),el('span',null,'路线任务完成度'));ring.append(inside);hero.append(ring);main.append(hero);
-const metrics=el('section','aw-metrics');for(const [value,label,detail] of [[`${s.done} / ${s.total}`,'已验收任务','依据周任务勾选'],[`${s.completedWeeks} / 16`,'完成学习周','全部任务完成才计入'],[`${s.hours.toFixed(1)} h`,'累计学习','来自每日记录'],[`${s.weekHours.toFixed(1)} / 14 h`,'最近 7 天','时间投入与掌握程度分开看']]){const box=el('div','aw-metric');box.append(el('strong',null,value),el('span',null,label),el('small',null,detail));metrics.append(box);}main.append(metrics);
-const content=el('div','aw-content');const left=el('div','aw-left');const right=el('aside','aw-right');content.append(left,right);main.append(content);
-const next=el('section','aw-card aw-next');next.append(el('p','aw-eyebrow','下一步 / NEXT ACTION'));const task=active?.tasks.find(t=>!t.done);next.append(el('h2',null,task?`W${String(active.week).padStart(2,'0')} · ${active.title}`:'路线任务已完成'));next.append(el('p','aw-next-task',task?task.text:'回顾项目证据，选择下一轮深入方向。'));const last=[...data.logs].sort((a,b)=>b.date.localeCompare(a.date)).find(l=>l.next);if(last){const resume=el('div','aw-resume');resume.append(el('small',null,'上次留给自己的起点'),el('p',null,last.next));next.append(resume);}const nextButtons=el('div','aw-actions');nextButtons.append(button('打开本周任务',()=>api.open(active.path)),button('章节笔记',()=>api.open(active.note)),button('阅读教材',()=>api.book(active.week)));next.append(nextButtons);left.append(next);
-const timeline=el('section','aw-card');const tHead=el('div','aw-section-head');tHead.append(el('h2',null,'你的 16 周路线'),el('span','aw-caption','点击周次查看任务'));timeline.append(tHead);const stageRow=el('div','aw-stages');stages.forEach((name,i)=>{const stage=el('div','aw-stage');const all=data.weeks.filter(w=>w.phase===i+1).flatMap(w=>w.tasks);const n=all.filter(t=>t.done).length;stage.append(el('span',null,`0${i+1} / ${name}`));const bar=el('div','aw-mini-track');const fill=el('i');fill.style.width=`${all.length?n/all.length*100:0}%`;bar.append(fill);stage.append(bar);stageRow.append(stage);});timeline.append(stageRow);const weeks=el('div','aw-weeks');for(const w of data.weeks){const d=w.tasks.filter(t=>t.done).length;const b=button(`W${String(w.week).padStart(2,'0')}`,()=>mount(root,data,api,w.week),'aw-week'+(selected.week===w.week?' is-selected':'')+(d===w.tasks.length?' is-complete':''));b.title=w.title;b.setAttribute('aria-pressed',String(selected.week===w.week));const fill=el('i');fill.style.width=`${d/w.tasks.length*100}%`;b.append(fill);weeks.append(b);}timeline.append(weeks);const detail=el('div','aw-week-detail');detail.append(el('p','aw-eyebrow',`W${String(selected.week).padStart(2,'0')} / ${selected.chapter}`),el('h3',null,selected.title));for(const t of selected.tasks){const label=el('label','aw-task');const cb=document.createElement('input');cb.type='checkbox';cb.checked=t.done;cb.disabled=!api.editable;cb.setAttribute('aria-label',t.text);cb.addEventListener('change',async()=>{cb.disabled=true;try{await api.toggle(selected.path,t.id,cb.checked);}catch(e){cb.checked=!cb.checked;api.notify(String(e.message||e));}finally{cb.disabled=!api.editable;}});label.append(cb,el('span',null,t.text));detail.append(label);}detail.append(button('打开任务与验收说明 ↗',()=>api.open(selected.path),'aw-text-button'));timeline.append(detail);left.append(timeline);
-const activity=el('section','aw-card');activity.append(el('h2',null,'学习节奏'),el('p','aw-caption','过去 8 周 · 按实际记录的分钟着色'));const grid=el('div','aw-activity');const map=new Map(data.logs.map(l=>[l.date,l.minutes]));for(const date of M.recentDates(today,56)){const minutes=map.get(date)||0;const b=button('',()=>api.editable?api.editLog(date):api.open('README.md'),'aw-day');b.dataset.level=minutes===0?'0':minutes<30?'1':minutes<90?'2':'3';b.title=`${date} · ${minutes}分钟`;b.setAttribute('aria-label',b.title);grid.append(b);}activity.append(grid,el('p','aw-caption',`${s.days} 天留下了学习记录。空白是未记录，不代表没有学习。`));right.append(activity);
-const records=el('section','aw-card');const rHead=el('div','aw-section-head');rHead.append(el('h2',null,'最近记录'),button('全部 ↗',()=>api.open('04-学习记录/记录索引.md'),'aw-text-button'));records.append(rHead);const logs=[...data.logs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4);if(!logs.length){records.append(el('p','aw-empty','还没有学习记录。完成第一个任务后，留下收获和下次起点。'));}else for(const l of logs){const row=el('div','aw-log');row.append(el('small',null,`${l.date} · ${l.minutes} 分钟`),el('p',null,l.summary||(l.publish?'未填写完成内容':'私人记录 · 正文保留在本地')));row.append(button(api.editable?'查看 / 修改':'查看公开记录',()=>api.editable?api.editLog(l.date):api.open(l.publicPath||'README.md'),'aw-text-button'));records.append(row);}right.append(records);
-const shelf=el('section','aw-card aw-shelf');shelf.append(el('h2',null,'学习入口'));for(const [label,path] of [['知识地图','03-学习笔记/知识地图.canvas'],['概念笔记','03-学习笔记/章节/01-Agent入门.md'],['实验记录模板','03-学习笔记/实验记录/实验记录模板.md'],['项目设计','03-学习笔记/章节/项目设计.md'],['使用指南','03-学习笔记/使用指南.md']])shelf.append(button(label+' ↗',()=>api.open(path),'aw-shelf-link'));right.append(shelf);
-const footer=el('footer','aw-footer');footer.append(el('span',null,api.editable?'Markdown 是记录源 · 勾选任务后自动更新':'公开快照 · 最后发布 '+(data.updated||'尚未发布')));footer.append(button(api.editable?'同步 GitHub ↗':'GitHub 源码 ↗',()=>api.editable?api.sync():api.repo(),'aw-text-button'));main.append(footer);
-return{selected:selected.week};}
+const phaseNames=['基础构建','知识与评估','能力进阶','项目交付'];
+function el(tag,cls,text){const x=document.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=text;return x;}
+function button(label,action,cls='aw-button'){
+ const b=el('button',cls,label);b.type='button';
+ b.addEventListener('click',async()=>{if(b.disabled)return;b.disabled=true;try{await action();}catch(e){const error=b.closest('.agent-workbench')?.querySelector('.aw-error');if(error){error.textContent=e.message||String(e);error.hidden=false;}}finally{if(b.isConnected)b.disabled=false;}});return b;
+}
+function plain(s){return s.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g,'$2').replace(/\[\[([^\]]+)\]\]/g,'$1').replace(/`([^`]+)`/g,'$1');}
+function progress(n,total,cls='aw-track'){const bar=el('div',cls);const fill=el('i');fill.style.width=`${total?n/total*100:0}%`;bar.append(fill);return bar;}
+function mount(root,data,api,selection={}){
+ const s=M.stats(data);if(!s.active){root.textContent='尚未找到学习安排。';return;}
+ const week=data.weeks.find(w=>w.week===selection.week)||s.active;
+ const day=week.days.find(d=>d.day===selection.day)||week.days.find(d=>!d.done)||week.days[0];
+ const tab=selection.tab||'day';root.replaceChildren();root.classList.add('agent-workbench');
+ root.dataset.selectedWeek=week.week;root.dataset.selectedDay=day.day;root.dataset.selectedTab=tab;
+ const select=(w,d,t=tab)=>mount(root,data,api,{week:w,day:d,tab:t});
+ const shell=el('div','aw-shell');root.append(shell);
+ const top=el('header','aw-top');const brand=el('div','aw-brand');brand.append(el('span','aw-logo','a.'),el('span','aw-brand-text','AGENT STUDIO'));
+ const topActions=el('div','aw-top-actions');topActions.append(button('知识地图 ↗',()=>api.open('03-学习笔记/知识地图.canvas'),'aw-quiet'),button(api.editable?'同步 GitHub ↗':'GitHub ↗',()=>api.editable?api.sync():api.repo(),'aw-quiet'));
+ top.append(brand,topActions);shell.append(top);
+ const heading=el('section','aw-heading');const h=el('div');h.append(el('p','aw-kicker','YOUR PERSONAL LEARNING SPACE'),el('h1',null,'学习工作台'));
+ const date=el('div','aw-date');date.append(el('span',null,M.localDate()),el('small',null,api.editable?'本地学习空间':'公开学习进度'));
+ heading.append(h,date);shell.append(heading);
+ const error=el('p','aw-error');error.setAttribute('role','alert');error.hidden=true;shell.append(error);
+ const overview=el('section','aw-overview');
+ for(const [v,l]of [[`${s.days}`,'已完成学习日'],[`${s.totalDays-s.days}`,'待学习日'],[`${s.completedWeeks} / ${data.weeks.length}`,'完成学习周']]){const a=el('div','aw-stat');a.append(el('strong',null,v),el('span',null,l));overview.append(a);}
+ const overall=el('div','aw-overall');const ohead=el('div','aw-inline');ohead.append(el('span',null,'总进度'),el('strong',null,`${s.percent}%`));overall.append(ohead,progress(s.days,s.totalDays),el('small',null,`${s.days} / ${s.totalDays} 天 · 按每日勾选计算`));overview.append(overall);shell.append(overview);
+ const layout=el('div','aw-layout');const main=el('div','aw-main');const aside=el('aside','aw-aside');layout.append(main,aside);shell.append(layout);
+ const hero=el('section','aw-focus');const heroText=el('div','aw-focus-text');
+ heroText.append(el('div','aw-focus-top',`${day.done?'已完成':'当前查看'}  /  W${week.week} · DAY ${day.day}`),el('h2',null,day.title),el('p','aw-focus-sub',`${week.chapter}  ·  ${day.allocation}`));
+ const heroActions=el('div','aw-focus-actions');
+ if(api.editable){const done=button(day.done?'✓ 已完成 · 撤销':'标记这一天完成',()=>api.toggleDay(week.path,day.key,!day.done),'aw-button aw-primary'+(day.done?' is-done':''));done.setAttribute('aria-pressed',String(day.done));heroActions.append(done);}
+ else heroActions.append(button('在 Obsidian 中学习 ↗',()=>api.openVault(),'aw-button aw-primary'));
+ heroActions.append(button('打开章节笔记 ↗',()=>api.open(week.note),'aw-focus-link'));heroText.append(heroActions);hero.append(heroText);
+ const dial=el('div','aw-dial');dial.style.setProperty('--angle',`${week.days.filter(d=>d.done).length/7*360}deg`);const dialInside=el('div');dialInside.append(el('strong',null,`${week.days.filter(d=>d.done).length}`),el('span',null,'/ 7 天'));dial.append(dialInside);hero.append(dial);main.append(hero);
+ const content=el('section','aw-card aw-detail');const detailTop=el('div','aw-detail-top');const tabs=el('div','aw-tabs');
+ for(const[key,label]of[['day','每日内容'],['week','每周目标']]){const b=button(label,()=>select(week.week,day.day,key),'aw-tab'+(tab===key?' is-active':''));b.setAttribute('aria-pressed',String(tab===key));tabs.append(b);}
+ detailTop.append(tabs,button('打开原文 ↗',()=>api.open(tab==='day'?week.path+'#'+day.anchor:week.path),'aw-quiet'));content.append(detailTop);
+ if(tab==='day'){
+  const body=el('div','aw-body');body.append(el('p','aw-detail-label',`W${week.week}D${day.day} · ${day.done?'已完成':'阅读与实践'}`));
+  for(const paragraph of day.body.split(/\n\s*\n/).filter(Boolean)){
+   if(/^[-\d]/.test(paragraph)){const group=el('div','aw-paragraph-list');for(const line of paragraph.split('\n'))group.append(el('p',null,plain(line)));body.append(group);}else body.append(el('p',null,plain(paragraph)));
+  }
+  const resources=el('div','aw-resources');resources.append(button('阅读教材 ↗',()=>api.book(week.week),'aw-resource'),button('本周完整安排 ↗',()=>api.open(week.path),'aw-resource'));body.append(resources);content.append(body);
+ }else{
+  const list=el('div','aw-goals');for(const t of week.tasks){const label=el('label','aw-task');const cb=document.createElement('input');cb.type='checkbox';cb.checked=t.done;cb.disabled=!api.editable;cb.setAttribute('aria-label',t.text);cb.addEventListener('change',async()=>{cb.disabled=true;try{await api.toggle(week.path,t.id,cb.checked);}catch(e){cb.checked=!cb.checked;error.hidden=false;error.textContent=e.message;}finally{cb.disabled=!api.editable;}});label.append(cb,el('span',null,t.text));list.append(label);}content.append(list);
+ }
+ main.append(content);
+ const seven=el('section','aw-card aw-seven');const sevenHead=el('div','aw-seven-head');sevenHead.append(el('div','aw-inline',`W${String(week.week).padStart(2,'0')} / 本周七天`),el('p',null,week.title));seven.append(sevenHead);
+ const weekSelect=el('select','aw-week-select');weekSelect.setAttribute('aria-label','选择学习周');for(const w of data.weeks){const op=el('option',null,`W${w.week} · ${w.title}`);op.value=w.week;op.selected=w.week===week.week;weekSelect.append(op);}weekSelect.onchange=()=>select(Number(weekSelect.value));seven.append(weekSelect);
+ const dayList=el('div','aw-day-list');for(const d of week.days){
+  const row=el('div','aw-day-row'+(d.day===day.day?' is-selected':'')+(d.done?' is-complete':''));
+  const check=document.createElement('input');check.type='checkbox';check.checked=d.done;check.disabled=!api.editable;check.setAttribute('aria-label',`${d.key} ${d.title} 完成`);check.onchange=async()=>{check.disabled=true;try{await api.toggleDay(week.path,d.key,check.checked);}catch(e){check.checked=!check.checked;error.hidden=false;error.textContent=e.message;}finally{check.disabled=!api.editable;}};
+  const pick=button('',()=>select(week.week,d.day),'aw-day-pick');const num=el('span','aw-day-number',`D${d.day}`);const text=el('span','aw-day-title',d.title);pick.append(num,text);pick.title=d.title;pick.setAttribute('aria-label',`查看 ${d.key} ${d.title}`);row.append(check,pick,el('span','aw-day-arrow',d.day===day.day?'↗':''));dayList.append(row);
+ }seven.append(dayList);aside.append(seven);
+ const resume=el('section','aw-resume');resume.append(el('p','aw-kicker','NEXT IN YOUR JOURNEY'),el('strong',null,s.days===s.totalDays?'本轮学习已完成':`W${s.next.week}D${s.next.day} · ${s.next.title}`),el('p',null,s.days===s.totalDays?'整理笔记，开始下一轮探索。':'第一个尚未勾选的学习日。按自己的节奏继续。'),button('前往下一学习日 →',()=>select(s.next.week,s.next.day),'aw-quiet'));aside.append(resume);
+ const route=el('section','aw-route');const routeHead=el('div','aw-route-head');routeHead.append(el('h2',null,'16 周路线'),el('span',null,'每一小格，都是一个学习日'));route.append(routeHead);const phases=el('div','aw-phases');
+ phaseNames.forEach((name,i)=>{const group=el('div','aw-phase');group.append(el('p','aw-phase-label',`0${i+1}  ${name}`));const grid=el('div','aw-route-weeks');for(const w of data.weeks.filter(w=>w.phase===i+1)){
+  const b=button('',()=>select(w.week), 'aw-route-week'+(week.week===w.week?' is-selected':''));b.title=`W${w.week} · ${w.title}`;b.setAttribute('aria-label',`查看第${w.week}周 ${w.title}`);b.append(el('span',null,`W${String(w.week).padStart(2,'0')}`));const cells=el('span','aw-cells');for(const d of w.days)cells.append(el('i',d.done?'is-done':(s.next?.key===d.key?'is-next':'')));b.append(cells);grid.append(b);
+ }group.append(grid);phases.append(group);});route.append(phases);shell.append(route);
+ const foot=el('footer','aw-footer');foot.append(el('span',null,api.editable?'按天推进 · 完成状态自动保存在周安排':'公开快照 · '+(data.updated||'')),button('完整学习路线 ↗',()=>api.open('01-学习计划/16周学习路线.md'),'aw-quiet'));shell.append(foot);
+ return {week:week.week,day:day.day,tab};
+}
 if(typeof module!=='undefined'&&module.exports)module.exports={mount};else scope.AgentDashboard={mount};
 })(typeof window!=='undefined'?window:globalThis);
