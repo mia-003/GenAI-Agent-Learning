@@ -92,9 +92,13 @@
           "week": 1,
           "title": "context实验",
           "body": "先运行一个完整上下文任务，保留输入、消息、工具调用、返回结果与停止原因，再比较完整模式与移除工具结果模式。运行条件保持一致，结果记到章节的“实践记录”。\n\n如果暂时无法实跑，可先阅读仓库已有轨迹，并注明这是历史结果。",
-          "record": null,
+          "record": {
+            "text": "今天用终端连DeepSeek API进行了上下文消融实验，查看“no tool result”（禁止模型看到工具调用的结果）对输出的影响。对比正常模式，模型依然进行了工具调用，但达到最高迭代限制后没有输出答案，说明上下文能力对输出的影响。",
+            "date": "2026-11-06",
+            "updatedAt": "2026-11-07T07:23:17.539Z"
+          },
           "allocation": "跑通实验60分钟，查看轨迹与消融对照60分钟",
-          "done": false,
+          "done": true,
           "path": "01-学习计划/周任务/周任务安排W1.md",
           "note": "04-章节笔记/第01章-AI-Agent入门-笔记.md",
           "anchor": "D4 · context实验"
@@ -2112,11 +2116,11 @@
       "date": "",
       "minutes": 0,
       "timeKnown": false,
-      "done": false,
+      "done": true,
       "studyDay": "W1D4",
       "week": 1,
       "publish": false,
-      "summary": "W1D4 · 待完成",
+      "summary": "W1D4 · 已完成",
       "understanding": "",
       "blocker": "",
       "next": "",
@@ -3797,5 +3801,5 @@
       }
     ]
   },
-  "updated": "2026年11月5日 21:21"
+  "updated": "2026年11月6日 23:23"
 }
