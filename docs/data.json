@@ -109,9 +109,13 @@
           "week": 1,
           "title": "单工具Agent",
           "body": "在「05-项目实践」实现一个只有计算工具的最小Agent。包含消息列表、工具分发、结果回传、参数检查、错误处理和轮数上限；请AI协助编写和调试。\n\n准备单步计算、多步折扣、金额舍入、缺少输入、除零错误等实践输入，提前记录预期行为，供D6比较。",
-          "record": null,
+          "record": {
+            "text": "利用终端搭建了只有 calculate 工具的最小 Agent，理解了工具定义（calculate计算器工具）、请求解析（本地将工具说明发送给大模型）、执行和结果回传（大模型决定工具调用、消息保存、判断是否再次迭代或输出）。加入参数检查、错误回传及4轮上限，验证了正常计算、除零（工具调用失败）、信息不足和折扣计算场景。",
+            "date": "2026-11-08",
+            "updatedAt": "2026-11-08T10:02:11.140Z"
+          },
           "allocation": "实现105分钟，准备对照输入15分钟",
-          "done": false,
+          "done": true,
           "path": "01-学习计划/周任务/周任务安排W1.md",
           "note": "04-章节笔记/第01章-AI-Agent入门-笔记.md",
           "anchor": "D5 · 单工具Agent"
@@ -122,9 +126,13 @@
           "week": 1,
           "title": "实验对照",
           "body": "在同一模型和同一组输入上比较有工具与无工具两种条件，查看输出、调用次数、停止原因和运行结果。对异常结果适量复跑，记录发现。工具组没有明显提升也可如实保留。",
-          "record": null,
+          "record": {
+            "text": "今天通过设置五种不同自然语言指令对比有工具调用（mode tools）和无工具调用（mode no-tools）的结果输出、迭代次数和工具调用次数。有工具模式比无工具模式多一轮模型迭代，无工具模式的工具调用次数都为0.",
+            "date": "2026-11-08",
+            "updatedAt": "2026-11-09T03:43:41.049Z"
+          },
           "allocation": "运行60分钟，排查与复跑40分钟，整理结果20分钟",
-          "done": false,
+          "done": true,
           "path": "01-学习计划/周任务/周任务安排W1.md",
           "note": "04-章节笔记/第01章-AI-Agent入门-笔记.md",
           "anchor": "D6 · 实验对照"
@@ -2131,11 +2139,11 @@
       "date": "",
       "minutes": 0,
       "timeKnown": false,
-      "done": false,
+      "done": true,
       "studyDay": "W1D5",
       "week": 1,
       "publish": false,
-      "summary": "W1D5 · 待完成",
+      "summary": "W1D5 · 已完成",
       "understanding": "",
       "blocker": "",
       "next": "",
@@ -2146,11 +2154,11 @@
       "date": "",
       "minutes": 0,
       "timeKnown": false,
-      "done": false,
+      "done": true,
       "studyDay": "W1D6",
       "week": 1,
       "publish": false,
-      "summary": "W1D6 · 待完成",
+      "summary": "W1D6 · 已完成",
       "understanding": "",
       "blocker": "",
       "next": "",
@@ -3801,5 +3809,5 @@
       }
     ]
   },
-  "updated": "2026年11月6日 23:23"
+  "updated": "2026年11月8日 19:43"
 }
