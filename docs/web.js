@@ -13,7 +13,7 @@ function validate(value){
  }return out;
 }
 function loadRecords(){const raw=localStorage.getItem(storageKey);return raw?validate(JSON.parse(raw)):{version:1,days:{}};}
-fetch('data.json?v=2a1c8db3580f',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('读取进度失败');return r.json();}).then(data=>{
+fetch('data.json?v=0443a06a65f9',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('读取进度失败');return r.json();}).then(data=>{
  let records;let storageError;try{records=loadRecords();}catch(e){storageError=e;records={version:1,days:{}};}
  const root=document.getElementById('workbench');
  const base=structuredClone(data);
